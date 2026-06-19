@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScalpSense</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/User/user_home.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/shared/user_footer.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/shared/modern_header.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/User/profile_dropdown.css')}}">
+    <style>
+        /* Services Carousel Styles */
+        .services-carousel-container {
+            perspective: 1200px;
+            perspective-origin: center center;
+        }
+        
+        .services-carousel {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+        
+        .service-card {
+            min-width: 420px;
+            max-width: 420px;
+            width: 420px;
+            height: 420px;
+            background: #DDF4FF;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: absolute;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transform-style: preserve-3d;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            background: #EBF8FF;
+            border-radius: 20px;
+            z-index: -1;
+            transition: opacity 0.6s;
+        }
+        
+        .service-card.center::before {
+            opacity: 1;
+        }
+        
+        .service-card.left::before,
+        .service-card.right::before {
+            opacity: 0;
+        }
+        
+        .service-card-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .service-card-icon svg {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .service-card-content {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .service-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 16px;
+        }
+        
+        .service-card-description {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #495057;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        
+        .service-card.left {
+            transform: translateX(-180px) translateZ(-80px) rotateY(25deg) scale(0.92);
+            opacity: 0.75;
+            z-index: 1;
+        }
+        
+        .service-card.center {
+            transform: translateX(0) translateZ(0) rotateY(0deg) scale(1);
+            opacity: 1;
+            z-index: 3;
+        }
+        
+        .service-card.right {
+            transform: translateX(180px) translateZ(-80px) rotateY(-25deg) scale(0.92);
+            opacity: 0.75;
+            z-index: 1;
+        }
+        
+        /* Hide text content on side cards */
+        .service-card.left .service-card-icon,
+        .service-card.left .service-card-content,
+        .service-card.right .service-card-icon,
+        .service-card.right .service-card-content {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
+        }
+        
+        /* Show text content on center card */
+        .service-card.center .service-card-icon,
+        .service-card.center .service-card-content {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .service-card.hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .carousel-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+        
+        .pagination-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-dot.active {
+            background: #212529;
+            width: 12px;
+            height: 12px;
+        }
+        
+        .carousel-nav-btn:hover {
+            background: #007bff;
+            border-color: #007bff;
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .service-card {
+                min-width: 85%;
+                max-width: 85%;
+                width: 85%;
+                height: 380px;
+                padding: 25px;
+            }
+            
+            .service-card.left {
+                transform: translateX(-130px) translateZ(-70px) rotateY(25deg) scale(0.88);
+                opacity: 0.85;
+            }
+            
+            .service-card.right {
+                transform: translateX(130px) translateZ(-70px) rotateY(-25deg) scale(0.88);
+                opacity: 0.85;
+            }
+            
+            .services-carousel {
+                height: 420px;
+            }
+            
+            .services-carousel-container {
+                padding: 0 60px;
+            }
+            
+            .service-card-title {
+                font-size: 1.4rem;
+            }
+            
+            .service-card-description {
+                font-size: 0.9rem;
+            }
+            
+            .service-card-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 20px;
+            }
+            
+            .service-card-icon svg {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Circles -->
+    <div class="bg-circle c1"></div>
+    <div class="bg-circle c2"></div>
+
+    <div id="messageDiv" class="btn"></div>
+
+    <nav class="modern-navbar">
+        <!-- Left: Logo and Brand -->
+        <div class="navbar-left">
+            <div class="logo-placeholder" style="border:none; background: transparent; padding: 0;">
+                <picture>
+                    <source srcset="{{ url_for('static', filename='img/scalpsense_logo.svg') }}" type="image/svg+xml">
+                    <img class="navbar-logo"
+                         src="{{ url_for('static', filename='img/scalpsense-logo.png') }}"
+                         alt="ScalpSense"
+                         loading="eager" />
+                </picture>
+            </div>
+            <a class="navbar-brand" href="/user/home" id="navbar-brand">ScalpSense</a>
+          </div>
+
+        <!-- Center: Navigation Links -->
+        <div class="navbar-center" id="navbarCenter">
+            <ul class="navbar-nav-center">
+              <li class="nav-item">
+                    <a class="nav-link active" href="/user/home">Home</a>
+              </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="#about_us">About Us</a>
+              </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="/user/info">Info</a>
+              </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="/user/marketplace">Market Place</a>
+              </li>
+              <li class="nav-item">
+                    <a class="nav-link" href="/user/self-test">Self-Test</a>
+              </li>
+              
+            </ul>
+          </div>
+
+        <!-- Right: Icons (Search, Notifications, Profile) -->
+        <div class="navbar-right">
+            <button class="navbar-icon-btn" type="button" title="Search">
+                <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </button>
+            <button class="navbar-icon-btn" type="button" title="Notifications">
+                <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                </svg>
+            </button>
+            <div class="profile-dropdown-container">
+                <button class="navbar-icon-btn profile-icon-btn" type="button" title="Profile">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </button>
+                <div class="profile-dropdown-menu">
+                    <a href="/user/profile" class="profile-dropdown-item profile-item">
+                        <span class="profile-dropdown-item-icon">
+                            <svg class="profile-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </span>
+                        <span class="profile-dropdown-item-text">Profile</span>
+                    </a>
+                    <a href="/logout" class="profile-dropdown-item logout-item">
+                        <span class="profile-dropdown-item-icon">
+                            <svg class="logout-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                            </svg>
+                        </span>
+                        <span class="profile-dropdown-item-text">Logout</span>
+                    </a>
+                </div>
+            </div>
+            <button class="mobile-menu-toggle" type="button" onclick="document.getElementById('navbarCenter').classList.toggle('show')">
+                <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+    <div>
+    <div id="carouselSection" class="mt-2">
+        <div id="carouselExampleCaptions" class="carousel slide" style="position: absolute;">
+            <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
+            </div>
+            <div class="carousel-inner">
+            <div class="carousel-item active" id="ytvideo1">
+                <img src="https://i.ytimg.com/vi/-Mj-gWLN-L4/maxresdefault.jpg" class="d-block m-auto w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                <a href="https://www.youtube.com/watch?v=-Mj-gWLN-L4" style="text-decoration:none; color: inherit;" target="_blank">
+                    <h5>Going Bald? This Could Be Why...</h5>
+                    <p style="font-size: 1.1rem; padding: 5px;">The most common cause of balding in men is androgenetic alopecia, also known as male pattern hair loss. It is essentially a genetic condition although there are many myths about its cause. This video is a deep dive into what causes men to go bald.</p>
+                </a>
+            </div>
+            </div>
+            <div class="carousel-item" id="ytvideo2">
+                <img src="https://i.ytimg.com/vi/SB2mJLwDjfg/maxresdefault.jpg" class="d-block m-auto w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                <a href="https://www.youtube.com/watch?v=SB2mJLwDjfg" style="text-decoration:none; color: inherit;" target="_blank">
+                    <h5>Hair Loss Treatments For Men</h5>
+                    <p style="font-size: 1.1rem; padding: 5px;">There is a lot of confusion about which hair loss treatments for men actually work, and which ones are bogus. So let's clear up the confusion by taking a comprehensive look into the scientifically backed treatment for men who are going bald.</p>
+                </a>
+            </div>
+            </div>
+            <div class="carousel-item" id="ytvideo3">
+                <img src="https://i.ytimg.com/vi/Sc3pkZzZcfo/maxresdefault.jpg" class="d-block m-auto w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                <a href="https://www.youtube.com/watch?v=Sc3pkZzZcfo" style="text-decoration:none; color: inherit;" target="_blank">
+                    <h5>The Early Signs Of Balding</h5>
+                    <p style="font-size: 1.1rem; padding: 5px;">This video provides an informative overview of hair loss, discussing its various types, causes, symptoms, and treatments. It covers common conditions such as male and female pattern baldness, alopecia areata, and telogen effluvium, as well as less common causes and associated skin conditions.</p>
+                </a>
+                </div>
+            </div>
+            <div class="carousel-item" id="ytvideo4">
+                <img src="https://i.ytimg.com/vi/004UHWXWD8Y/maxresdefault.jpg" class="d-block m-auto w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                <a href="https://www.youtube.com/watch?v=004UHWXWD8Y" style="text-decoration:none; color: inherit;" target="_blank">
+                    <h5>Natural Hair Growth Cycle</h5>
+                    <p style="font-size: 1.1rem; padding: 5px;">This video delves into the science behind hair growth cycles and common reasons for hair loss. It explains the phases of the hair growth cycle - Anagen, Catagen, and Telogen - and how disruptions in this cycle can lead to hair fall and thinning. Additionally, it discusses various types of hair loss such as androgenetic alopecia, alopecia areata, traction alopecia, anagen effluvium, and telogen effluvium, shedding light on their causes and progression.</p>
+                </a>
+                </div>
+            </div>
+            </div>
+            <button class="carousel-control-prev" id="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" id="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    </div>
+
+    <div class="selfTestContainer">
+        <div class="bgImage">
+            <img src="https://ia.acs.org.au/content/dam/ia/article/images/face%20scanner.jpg" alt="">
+            <div class="overlayImage">
+                <h3>Take A Self Test</h3>
+                <div id="overlayText">
+                    Our state-of-the-art Machine Learning Model is trained on vast datasets of facial images to ensure that our system delivers consistent results across diverse demographics and ethnicities.
+                    <br><br>
+                    By analyzing key indicators, our model can accurately classify individuals into different stages of baldness, ranging from  minimal hair loss to advanced balding.
+                </div>
+                <div id="overlayTextForMobile">
+                    Our state-of-the-art Machine Learning Model is trained on vast datasets of facial images to ensure that our system delivers consistent results across diverse demographics and ethnicities.
+                </div>
+                <button class="btn" id="proceedToSelfTextBtn"> Take Test </button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Our Services Section with Moving Blue Cards Carousel -->
+    <div class="services-section" style="padding: 80px 20px; position: relative;">
+        <div style="position: relative; max-width: 1200px; margin: 0 auto;">
+            <!-- Section Label -->
+            <div style="text-align: center; margin-bottom: 10px;">
+                <span style="font-size: 0.9rem; font-weight: 600; color: #dc3545; text-transform: uppercase; letter-spacing: 2px;">KEY FEATURES</span>
+                </div>
+            
+            <!-- Section Title -->
+            <h2 class="text-center" style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; font-weight: 700; color: #212529; margin-bottom: 60px;">Our Services</h2>
+
+            <!-- Carousel Container -->
+            <div class="services-carousel-container" style="position: relative; padding: 0 80px;">
+                <!-- Left Navigation Arrow -->
+                <button class="carousel-nav-btn carousel-nav-left" onclick="moveCarousel(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid #dee2e6; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+
+                <!-- Right Navigation Arrow -->
+                <button class="carousel-nav-btn carousel-nav-right" onclick="moveCarousel(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%; background: white; border: 2px solid #dee2e6; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>                        
+                </button>
+
+                <!-- Cards Container -->
+                <div class="services-carousel" id="servicesCarousel">
+                    <!-- Service Cards will be inserted here by JavaScript -->
+        </div>
+                
+                <!-- Pagination Dots -->
+                <div class="carousel-pagination" id="carouselPagination">
+                    <!-- Pagination dots will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-center" id="about_us" style="font-family: 'Poppins', sans-serif;">Our Team</h2>
+    <div class="teamContainer">
+        <div>
+            <div class="teamCard" id="joydeep">
+                <div class="imageHolder">
+                    <div class="imageHover"></div>
+                </div>
+                <div class="TextHolder">
+                    <div>Joydeep Banerjee</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="teamCard" id="souptik">
+                <div class="imageHolder">
+                    <div class="imageHover"></div>
+                </div>
+                <div class="TextHolder">
+                    <div>Souptik Saha</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% set show_footer_description = True %}
+    {% include 'shared/user_footer.html' %}
+
+    <script src="{{url_for('static', filename='js/User/user_home.js')}}" type="module"></script>
+    <script src="{{url_for('static', filename='js/User/profile_dropdown.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        // Services Carousel Data
+        const services = [
+            {
+                icon: `<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M101.25 90C99.5796 90.0076 97.9324 90.3922 96.4312 91.125L80.3063 75H67.5V82.5H77.1975L91.1287 96.4313C90.3955 97.9324 90.0097 99.5794 90 101.25C90 103.475 90.6598 105.65 91.896 107.5C93.1321 109.35 94.8891 110.792 96.9448 111.644C99.0005 112.495 101.262 112.718 103.445 112.284C105.627 111.85 107.632 110.778 109.205 109.205C110.778 107.632 111.85 105.627 112.284 103.445C112.718 101.262 112.495 99.0005 111.644 96.9448C110.792 94.8892 109.35 93.1321 107.5 91.896C105.65 90.6598 103.475 90 101.25 90ZM101.25 105C100.508 105 99.7833 104.78 99.1666 104.368C98.5499 103.956 98.0693 103.37 97.7854 102.685C97.5016 102 97.4274 101.246 97.5721 100.518C97.7167 99.791 98.0739 99.1228 98.5983 98.5984C99.1228 98.0739 99.791 97.7168 100.518 97.5721C101.246 97.4274 102 97.5016 102.685 97.7855C103.37 98.0693 103.956 98.5499 104.368 99.1666C104.78 99.7833 105 100.508 105 101.25C105 102.245 104.605 103.198 103.902 103.902C103.198 104.605 102.245 105 101.25 105Z" fill="#FFA500"/>
+                    <path d="M67.5 22.5H75V15H67.5C65.3629 15.0071 63.2524 15.4736 61.3114 16.3678C59.3704 17.2619 57.6442 18.5629 56.25 20.1825C54.8558 18.5629 53.1296 17.2619 51.1886 16.3678C49.2476 15.4736 47.1371 15.0071 45 15H41.25C32.302 15.0099 23.7233 18.5689 17.3961 24.8961C11.0689 31.2233 7.50993 39.802 7.5 48.75V71.25C7.50993 80.198 11.0689 88.7767 17.3961 95.1039C23.7233 101.431 32.302 104.99 41.25 105H45C47.1371 104.993 49.2476 104.526 51.1886 103.632C53.1296 102.738 54.8558 101.437 56.25 99.8175C57.6442 101.437 59.3704 102.738 61.3114 103.632C63.2524 104.526 65.3629 104.993 67.5 105H75V97.5H67.5C65.5115 97.498 63.605 96.7072 62.1989 95.3011C60.7928 93.895 60.002 91.9885 60 90V30C60.002 28.0115 60.7928 26.105 62.1989 24.6989C63.605 23.2928 65.5115 22.502 67.5 22.5Z" fill="#FFA500"/>
+                </svg>`,
+                title: "ML Model",
+                description: "Our proprietary ML model, enhanced with various computer vision algorithms, empowers ScalpSense to precisely assess the stage of baldness, providing users with personalized insights into their hair health journey."
+            },
+            {
+                icon: `<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M74.2 81.3001C89.3 84.1501 100 91.4501 100 100V110H20V100C20 91.4501 30.7 84.1501 45.8 81.3001L60 105L74.2 81.3001ZM40 40.0001H80V50.0001C80 55.3044 77.8929 60.3915 74.1421 64.1422C70.3914 67.8929 65.3043 70.0001 60 70.0001C54.6957 70.0001 49.6086 67.8929 45.8579 64.1422C42.1071 60.3915 40 55.3044 40 50.0001V40.0001ZM40 35.0001L42.05 14.5001C42.1744 13.2624 42.7556 12.1156 43.6801 11.2835C44.6047 10.4514 45.8062 9.99383 47.05 10.0001H73C75.55 10.0001 77.7 11.9501 77.95 14.5001L80 35.0001H40ZM60 15.0001H55V20.0001H50V25.0001H55V30.0001H60V25.0001H65V20.0001H60V15.0001Z" fill="#FFA500"/>
+                </svg>`,
+                title: "Consult Doctors",
+                description: "Our dedicated Doctor Consultation platform facilitates direct communication with experienced professionals, enabling users to seek tailored guidance and support for their specific hair care needs and concerns."
+            },
+            {
+                icon: `<svg style="scale: 0.9;" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M72 16H64V0H56V16H48C35.2696 16 23.0606 21.0571 14.0589 30.0589C5.05713 39.0606 0 51.2696 0 64C0 76.7304 5.05713 88.9394 14.0589 97.9411C23.0606 106.943 35.2696 112 48 112H72C73.04 112 74.08 111.968 75.112 111.896L107.032 119.88C107.702 120.047 108.403 120.037 109.068 119.853C109.733 119.668 110.339 119.315 110.827 118.827C111.315 118.339 111.668 117.733 111.853 117.068C112.037 116.403 112.047 115.702 111.88 115.032L107.264 96.56C113.593 89.7047 117.787 81.1535 119.332 71.9524C120.878 62.7512 119.709 53.2991 115.968 44.752C112.226 36.2049 106.075 28.9335 98.2663 23.8271C90.4577 18.7208 81.3301 16.0008 72 16ZM40 52C40 46.6957 42.1071 41.6086 45.8579 37.8579C49.6086 34.1071 54.6957 32 60 32C65.3043 32 70.3914 34.1071 74.1421 37.8579C77.8929 41.6086 80 46.6957 80 52C80 57.3043 77.8929 62.3914 74.1421 66.1421C70.3914 69.8929 65.3043 72 60 72C54.6957 72 49.6086 69.8929 45.8579 66.1421C42.1071 62.3914 40 57.3043 40 52ZM60 96C51.8176 96.0122 43.8769 93.2261 37.496 88.104L42.504 81.864C47.296 85.704 53.376 88 60 88C66.624 88 72.704 85.704 77.496 81.864L82.504 88.104C76.123 93.2261 68.1824 96.0122 60 96Z" fill="#FFA500"/>
+                </svg>`,
+                title: "Chat Bot",
+                description: "With our intelligent ScalpSense chatbot, users can seamlessly address queries ranging from product recommendations to expert advice on hair fall and baldness concerns, ensuring a responsive and informative user experience."
+            },
+            {
+                icon: `<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23.1575 15C22.2125 15 21.37 15.655 21.045 16.64L15.275 34.1675C15.0928 34.7218 15 35.3015 15 35.885V42.8575C15 46.8 17.8775 50 21.4275 50C24.9775 50 27.8575 46.8 27.8575 42.8575C27.8575 46.8025 30.735 50 34.285 50C37.835 50 40.715 46.8 40.715 42.8575C40.715 46.8025 43.5925 50 47.1425 50C50.6925 50 53.5675 46.805 53.5725 42.8625C53.5725 46.805 56.45 50 60 50C63.55 50 66.4275 46.8 66.4275 42.8575C66.4275 46.8025 69.3075 50 72.8575 50C76.4075 50 79.2825 46.805 79.285 42.8625C79.2875 46.805 82.165 50 85.715 50C89.265 50 92.1425 46.8 92.1425 42.8575C92.1425 46.8025 95.02 50 98.5725 50C102.123 50 105 46.8 105 42.8575V35.885C105 35.3015 104.907 34.7218 104.725 34.1675L98.955 16.6425C98.63 15.655 97.7875 15 96.8425 15H23.1575Z" fill="#FFA500"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M25 53.075V72.5H18.75C18.4185 72.5 18.1005 72.6317 17.8661 72.8661C17.6317 73.1005 17.5 73.4185 17.5 73.75V76.25C17.5 76.5815 17.6317 76.8995 17.8661 77.1339C18.1005 77.3683 18.4185 77.5 18.75 77.5H101.25C101.582 77.5 101.899 77.3683 102.134 77.1339C102.368 76.8995 102.5 76.5815 102.5 76.25V73.75C102.5 73.4185 102.368 73.1005 102.134 72.8661C101.899 72.6317 101.582 72.5 101.25 72.5H95V53.075C93.9535 52.6579 92.9868 52.0634 92.1425 51.3175C91.4944 51.8891 90.7741 52.3732 90 52.7575V72.5H30V52.7575C29.2259 52.3732 28.5056 51.8891 27.8575 51.3175C27.0175 52.055 26.0575 52.655 25 53.075ZM21.25 82.5C20.9185 82.5 20.6005 82.6317 20.3661 82.8661C20.1317 83.1005 20 83.4185 20 83.75V102.5C20 103.163 20.2634 103.799 20.7322 104.268C21.2011 104.737 21.837 105 22.5 105H97.5C98.163 105 98.7989 104.737 99.2678 104.268C99.7366 103.799 100 103.163 100 102.5V83.75C100 83.4185 99.8683 83.1005 99.6339 82.8661C99.3995 82.6317 99.0815 82.5 98.75 82.5H21.25Z" fill="#FFA500"/>
+                    <path d="M35 66.25C35 65.9185 35.1317 65.6005 35.3661 65.3661C35.6005 65.1317 35.9185 65 36.25 65H43.75C44.0815 65 44.3995 65.1317 44.6339 65.3661C44.8683 65.6005 45 65.9185 45 66.25V71.25C45 71.5815 44.8683 71.8995 44.6339 72.1339C44.3995 72.3683 44.0815 72.5 43.75 72.5H36.25C35.9185 72.5 35.6005 72.3683 35.3661 72.1339C35.1317 71.8995 35 71.5815 35 71.25V66.25Z" fill="#FFA500"/>
+                    <path d="M40 68.75C40 68.4185 40.1317 68.1005 40.3661 67.8661C40.6005 67.6317 40.9185 67.5 41.25 67.5H48.75C49.0815 67.5 49.3995 67.6317 49.6339 67.8661C49.8683 68.1005 50 68.4185 50 68.75V71.25C50 71.5815 49.8683 71.8995 49.6339 72.1339C49.3995 72.3683 49.0815 72.5 48.75 72.5H41.25C40.9185 72.5 40.6005 72.3683 40.3661 72.1339C40.1317 71.8995 40 71.5815 40 71.25V68.75ZM60 68.75C60 69.7446 59.6049 70.6984 58.9016 71.4016C58.1984 72.1049 57.2446 72.5 56.25 72.5C55.2554 72.5 54.3016 72.1049 53.5984 71.4016C52.8951 70.6984 52.5 69.7446 52.5 68.75C52.5 67.7554 52.8951 66.8016 53.5984 66.0984C54.3016 65.3951 55.2554 65 56.25 65C57.2446 65 58.1984 65.3951 58.9016 66.0984C59.6049 66.8016 60 67.7554 60 68.75Z" fill="#FFA500"/>
+                </svg>`,
+                title: "Market Place",
+                description: "Explore our comprehensive Marketplace, thoughtfully curated with products categorized by baldness stage and diverse preferences, offering a convenient shopping experience tailored to individual hair care requirements"
+            },
+            {
+                icon: `<svg style="scale:0.9" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M65 45H55V35H65M65 85H55V55H65M60 10C53.4339 10 46.9321 11.2933 40.8658 13.806C34.7995 16.3188 29.2876 20.0017 24.6447 24.6447C15.2678 34.0215 10 46.7392 10 60C10 73.2608 15.2678 85.9785 24.6447 95.3553C29.2876 99.9983 34.7995 103.681 40.8658 106.194C46.9321 108.707 53.4339 110 60 110C73.2608 110 85.9785 104.732 95.3553 95.3553C104.732 85.9785 110 73.2608 110 60C110 53.4339 108.707 46.9321 106.194 40.8658C103.681 34.7995 99.9983 29.2876 95.3553 24.6447C90.7124 20.0017 85.2005 16.3188 79.1342 13.806C73.0679 11.2933 66.5661 10 60 10Z" fill="#FFA500"/>
+                </svg>`,
+                title: "Information",
+                description: "At ScalpSense, we prioritize education and awareness, delivering accurate information to empower users with a deeper understanding of the various stages of hair fall and proactive measures for maintaining optimal scalp health."
+            }
+        ];
+
+        let currentIndex = 0;
+
+        // Initialize carousel
+        function initCarousel() {
+            const carousel = document.getElementById('servicesCarousel');
+            const pagination = document.getElementById('carouselPagination');
+            
+            carousel.innerHTML = '';
+            pagination.innerHTML = '';
+            
+            // Create cards
+            services.forEach((service, index) => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                card.dataset.index = index;
+                
+                card.innerHTML = `
+                    <div class="service-card-icon">
+                        ${service.icon}
+                    </div>
+                    <div class="service-card-content">
+                        <div class="service-card-title">${service.title}</div>
+                        <div class="service-card-description">${service.description}</div>
+                    </div>
+                `;
+                
+                carousel.appendChild(card);
+            });
+            
+            // Create pagination dots
+            services.forEach((service, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'pagination-dot';
+                if (index === 0) dot.classList.add('active');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateCarousel();
+                });
+                pagination.appendChild(dot);
+            });
+            
+            updateCarousel();
+        }
+
+        // Move carousel
+        function moveCarousel(direction) {
+            currentIndex += direction;
+            
+            if (currentIndex < 0) {
+                currentIndex = services.length - 1;
+            } else if (currentIndex >= services.length) {
+                currentIndex = 0;
+            }
+            
+            updateCarousel();
+        }
+
+        // Update carousel display
+        function updateCarousel() {
+            const cards = document.querySelectorAll('.service-card');
+            const dots = document.querySelectorAll('.pagination-dot');
+            
+            cards.forEach((card, index) => {
+                card.classList.remove('left', 'center', 'right', 'hidden');
+                
+                // Calculate relative position
+                let relativeIndex = index - currentIndex;
+                
+                // Handle looping
+                if (relativeIndex < -Math.floor(services.length / 2)) {
+                    relativeIndex += services.length;
+                } else if (relativeIndex > Math.floor(services.length / 2)) {
+                    relativeIndex -= services.length;
+                }
+                
+                // Position cards
+                if (relativeIndex === -1) {
+                    card.classList.add('left');
+                } else if (relativeIndex === 0) {
+                    card.classList.add('center');
+                } else if (relativeIndex === 1) {
+                    card.classList.add('right');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            // Update pagination dots
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentIndex) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        // Auto-rotate carousel
+        let autoRotateInterval;
+        function startAutoRotate() {
+            autoRotateInterval = setInterval(() => {
+                moveCarousel(1);
+            }, 3000); // 3 seconds between slides
+        }
+
+        function stopAutoRotate() {
+            clearInterval(autoRotateInterval);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCarousel();
+            startAutoRotate();
+            
+            // Pause on hover
+            const carouselContainer = document.querySelector('.services-carousel-container');
+            carouselContainer.addEventListener('mouseenter', stopAutoRotate);
+            carouselContainer.addEventListener('mouseleave', startAutoRotate);
+            
+            // Handle window resize
+            window.addEventListener('resize', updateCarousel);
+        });
+    </script>
+</body>
+</html>

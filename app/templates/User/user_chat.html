@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScalpSense</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/User/user_chat.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/shared/modern_header.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/User/profile_dropdown.css')}}">
+</head>
+<body>
+    
+    <div class="root">
+
+        <nav class="modern-navbar">
+            <div class="navbar-left">
+            <div class="logo-placeholder" style="border:none; background: transparent; padding: 0;">
+                <picture>
+                    <source srcset="{{ url_for('static', filename='img/scalpsense_logo.svg') }}" type="image/svg+xml">
+                    <img class="navbar-logo"
+                         src="{{ url_for('static', filename='img/scalpsense-logo.png') }}"
+                         alt="ScalpSense"
+                         loading="eager" />
+                </picture>
+            </div>
+                <a class="navbar-brand" href="/user/home" id="navbar-brand">ScalpSense</a>
+          </div>
+            <div class="navbar-center" id="navbarCenter">
+                <ul class="navbar-nav-center">
+                    <li class="nav-item"><a class="nav-link" href="/user/home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/about">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/info">Info</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/marketplace">Market Place</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/self-test">Self-Test</a></li>
+                    
+            </ul>
+          </div>
+            <div class="navbar-right">
+                <button class="navbar-icon-btn" type="button" title="Search">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                </button>
+                <button class="navbar-icon-btn" type="button" title="Notifications">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                </button>
+                <div class="profile-dropdown-container">
+                    <button class="navbar-icon-btn profile-icon-btn" type="button" title="Profile">
+                        <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </button>
+                    <div class="profile-dropdown-menu">
+                        <a href="/user/profile" class="profile-dropdown-item profile-item">
+                            <span class="profile-dropdown-item-icon">
+                                <svg class="profile-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </span>
+                            <span class="profile-dropdown-item-text">Profile</span>
+                        </a>
+                        <a href="/logout" class="profile-dropdown-item logout-item">
+                            <span class="profile-dropdown-item-icon">
+                                <svg class="logout-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                                </svg>
+                            </span>
+                            <span class="profile-dropdown-item-text">Logout</span>
+                        </a>
+                    </div>
+                </div>
+                <button class="mobile-menu-toggle" type="button" onclick="document.getElementById('navbarCenter').classList.toggle('show')">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;">
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    
+        <div class="gridContainer">
+          <div id="contactList" class="contactList" style="border-right: 1px solid rgba(0,0,0,0.2);">
+            <div id="chatbot" class="w-100" style="min-height: 70px; display: grid; grid-template-rows: 1fr; box-shadow: 1px 1px 2px rgba(0,0,0,0.5); cursor: pointer;">
+              <div style="display: grid; grid-template-columns: 2fr 5fr;">
+                <div style="aspect-ratio: 1; position: relative;">
+                  <div class="iconDiv border border-black w-75 h-75 rounded-circle" style="position: absolute;top:50%; left:50%; transform: translate(-50%,-50%);">
+                    <img src="https://static.vecteezy.com/system/resources/thumbnails/007/225/199/small/robot-chat-bot-concept-illustration-vector.jpg" alt="">
+                  </div>
+                </div>
+                <div style="position: relative;">
+                  <div class="chatbot-title">Chatbot</div>
+                </div>
+              </div>
+            </div>
+    
+            <div class="mt-5 mb-5 text-black font-monospace text-center text-decoration-underline" style="font-size: 1.5rem; text-underline-offset: 3px;">Connect with Doctors</div>
+    
+            <!-- <div class="w-100" style="min-height: 70px; display: grid; grid-template-rows: 1fr; box-shadow: 1px 1px 2px rgba(0,0,0,0.5); cursor: pointer; overflow: hidden;">
+              <div style="display: grid; grid-template-columns: 2fr 5fr; overflow: hidden;">
+                <div style="aspect-ratio: 1; position: relative; overflow: hidden;">
+                  <div class="iconDiv border border-black w-75 h-75 rounded-circle" style="position: absolute;top:50%; left:50%; transform: translate(-50%,-50%);">
+                    <img src="https://st4.depositphotos.com/7877830/25337/v/450/depositphotos_253374286-stock-illustration-vector-illustration-male-doctor-avatar.jpg">
+                  </div>
+                </div>
+                <div style="position: relative; overflow: hidden;">
+                  <div class="contact-title" style="font-size: 1.2rem; text-align: start; overflow: hidden">
+                    Dr. Vivek Singh
+                    <div style="font-weight: 300; font-size: 0.7em; overflow: auto;">
+                      <p style="display: block; overflow: auto;">
+                        Experience: 10 Years
+                        <br>
+                        Location: Warje, Pune.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+    
+          </div>
+          <div id="messageBox" class="messageBox" style="display:none">
+            <div class="message-title">
+              <div class="position-relative overflow-hidden">
+                <div class="profile-pic">
+                  <img id="chat-profile-pic" src="" style="display: block; margin:auto; width: 100%; height: auto;">
+                </div>
+              </div>
+              <div class="position-relative">
+                <div id="chat-name" style="font-size: 1.5rem; text-align: start; overflow: hidden; position: absolute; top:50%; width: 100%; transform: translateY(-50%); font-family: 'Poppins', sans-serif; font-weight: 600; color:white">
+                  <!-- Dr. Vivek Singh -->
+                </div>
+              </div>
+            </div>
+            <div id="message-history" class="message-history">
+              <!-- <div class="message receiver">
+                <div class="message-blob">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, deserunt illum illo fugit similique dolorem explicabo architecto odit repellendus dolore tenetur, in minus assumenda, ullam libero temporibus iure dolores et?
+                </div>
+              </div>
+              <div class="message sender">
+                <div class="message-blob">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, deserunt illum illo fugit similique dolorem explicabo architecto odit repellendus dolore tenetur, in minus assumenda, ullam libero temporibus iure dolores et?
+                </div>
+              </div>
+     -->
+              
+            </div>
+    
+            <div class="message-box" style="position: relative;">
+              <form id="messageForm">
+                <div id="addonContainer">
+                    <div class="input-group-text" style="background-color: inherit; color:black; font-weight: 500; text-align: center;"> >> </div>
+                </div>
+                <div class="messageContainer">
+                    <textarea class="form-control" id="userMessage" placeholder="Type a message" rows="3"></textarea>
+                </div>
+                <div class="sendButtonContainer">
+                    <input type="submit" id="sendMessageBtn" class="btn btn-secondary" value="Send">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    
+    </div>
+    <script src="{{url_for('static', filename='js/User/user_chat.js')}}" type="module"></script>
+    <script src="{{url_for('static', filename='js/User/profile_dropdown.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
