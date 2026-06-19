@@ -26,13 +26,13 @@ INTENT_RESPONSES = [
     {
         "keywords": ["bye", "goodbye", "see you", "take care"],
         "response": (
-            "Goodbye! 👋 Remember you can revisit the self-test anytime or email joy628545@gmail.com for personal assistance."
+            "Goodbye! 👋 Remember you can revisit the self-test anytime or contact us for personal assistance."
         )
     },
     {
         "keywords": ["contact", "email", "support"],
         "response": (
-            "You can reach the ScalpSense team at joy628545@gmail.com or through the Contact section of the website."
+            "You can reach the ScalpSense team through the Contact section of the website."
         )
     },
     {
@@ -73,7 +73,7 @@ QA_PAIRS = _load_qa_pairs()
 FALLBACK_RESPONSE = (
     "I’m here to help with anything related to ScalpSense. "
     "Could you please rephrase your question? "
-    "You can also email joy628545@gmail.com for detailed assistance."
+    "You can also contact our support team for detailed assistance."
 )
 
 
@@ -103,7 +103,7 @@ def _get_best_answer(prompt: str) -> str:
     # keyword-based hints for common intents
     if 'doctor' in prompt_lower or 'consult' in prompt_lower:
         return ("You can connect with our verified doctors directly from the chat page "
-                "or email joy628545@gmail.com with your details for a callback.")
+                "or contact support with your details for a callback.")
 
     if 'product' in prompt_lower or 'recommend' in prompt_lower:
         return ("Visit the Marketplace tab to explore remedies curated for every scalp stage. "
